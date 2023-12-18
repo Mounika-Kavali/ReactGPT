@@ -1,0 +1,70 @@
+{
+  "employees": [
+    {
+      "name": "John Smith",
+      "empId": "E1001",
+      "role": "Software Developer",
+      "position": "Senior Developer",
+      "joiningDate": "5 January 2019",
+      "phoneNumber": "9876543210",
+      "salaryPerMonth": 50000,
+      "packagePerYear": 600000,
+      "description": "John has over 8 years of experience developing web and mobile applications. He specializes in React and Node.js development.",
+      "remark": "Good communication skills. Has shown leadership capabilities.",
+      "proficientIn": ["React", "Node.js", "JavaScript"]
+    },
+    {
+      "name": "Sarah Parker",
+      "empId": "E1002",
+      "role": "Cloud Engineer",
+      "position": "Cloud Architect",
+      "joiningDate": "15 March 2021",
+      "phoneNumber": "9856742310",
+      "salaryPerMonth": 65000,
+      "packagePerYear": 780000,
+      "description": "Sarah has worked extensively on AWS cloud platform managing large scale infrastructures.She also has 3 years of experience and has led multiple teams in cloud migration and deployment.",
+      "remark": "Excellent technical skills. Takes initiative in leading projects.",
+      "proficientIn": ["AWS", "DevOps", "Docker", "Kubernetes"]
+    },
+
+    {
+      "name": "David Carter",
+      "empId": "E1003",
+      "role": "Product Manager",
+      "position": "Senior Product Manager",
+      "joiningDate": "1 January 2021",
+      "phoneNumber": "8877445500",
+      "salaryPerMonth": 45000,
+      "packagePerYear": 540000,
+      "description": "David handles product planning, roadmaps, and development of new features. He has 7 years of product management expertise and comes from a developer background.",
+      "remark": "Outstanding ability to understand customer needs. Driven.",
+      "proficientIn": ["Roadmapping", "Requirement Analysis"]
+    },
+    {
+      "name": "Jenny Wilson",
+      "empId": "E1004",
+      "role": "UI/UX Designer",
+      "position": "Principal Designer",
+      "joiningDate": "12 May 2020",
+      "phoneNumber": "8800220045",
+      "salaryPerMonth": 38000,
+      "packagePerYear": 456000,
+      "description": "Jenny focuses on designing intuitive and aesthetic interfaces for web and mobile apps. She has designed style guides for over 12 products till date.",
+      "remark": "Extremely creative. Pays attention to fine details.",
+      "proficientIn": ["Adobe XD", "Figma", "User Research"]
+    },
+    {
+      "name": "Mark Davis",
+      "empId": "E1005",
+      "role": "DevOps Engineer",
+      "position": "Lead DevOps Engineer",
+      "joiningDate": "20 September 2018",
+      "phoneNumber": "9900220066",
+      "salaryPerMonth": 65000,
+      "packagePerYear": 780000,
+      "description": "Mark has set up CI/CD pipelines, Kubernetes clusters and cloud infra for various products over the past 5 years. He is an expert in deployment automation.",
+      "remark": "Hardworking. Gets things done efficiently.",
+      "proficientIn": ["Kubernetes", "AWS", "Ansible", "Terraform"]
+    }
+  ]
+}

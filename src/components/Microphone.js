@@ -36,7 +36,6 @@ const Microphone = ({ onSpeechResult }) => {
     } else {
       SpeechRecognition.startListening();
     }
-    // console.log(transcript, "aa");
   };
 
   return (
