@@ -30,8 +30,10 @@
 }
 
 .user {
-  align-self: flex-end;
   background-color: #e4fcf8;
+}
+.assistant {
+  background-color: #e1f7d3;
 }
 
 .chat-input {
