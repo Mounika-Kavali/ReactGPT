@@ -64,6 +64,13 @@
   font-size: medium;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
+.file-attachment-icon {
+  cursor: pointer;
+}
+.file-attachment-icon:hover {
+  background-color: rgb(193, 193, 243);
+  border-radius: 50%;
+}
 .mic-icon {
   cursor: pointer;
 }

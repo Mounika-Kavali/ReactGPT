@@ -4,6 +4,7 @@ import axios from "axios";
 import SendIcon from "@material-ui/icons/Send";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import Microphone from "./Microphone";
+import FileAttach from "./FileAttach";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
@@ -56,7 +57,7 @@ const ChatInterface = () => {
   const handleSendMessage = async () => {
     if (inputText.trim() === "") return;
 
-    const apiKey = "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";
+    const apiKey = "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";
 
     try {
       const response = await axios.post(
@@ -79,7 +80,7 @@ const ChatInterface = () => {
           receiver: "user",
           request: inputText,
           response: response.data.choices[0].message.content,
-          sender: response.data.choices[0].message.role,
+          sender: "assistant",
         },
       ]);
     } catch (error) {
@@ -105,6 +106,9 @@ const ChatInterface = () => {
             rows={Math.min(inputText.split("\n").length + 1, 4)} // Set the initial number of rows to the number of lines in the text up to a maximum of 4
             onKeyDown={handleKeyPress}
           />
+          <div className="file-icon">
+            <FileAttach />
+          </div>
           <div className="mic-icon">
             <Microphone onSpeechResult={handleSpeechResult} />
           </div>
@@ -123,6 +127,7 @@ const ChatInterface = () => {
               style={{
                 fontFamily: "sans-serif",
                 fontSize: "medium",
+                whiteSpace: "pre-line", // preserve both spaces and line breaks in the rendered text.
               }}
             >
               <div style={{ minHeight: "10px" }}>{message.request}</div>
@@ -134,11 +139,23 @@ const ChatInterface = () => {
                 fontSize: "medium",
               }}
             >
-              {message.response.split("\n").map((line, i) => (
-                <div key={i} style={{ minHeight: "10px" }}>
-                  {line}
+              {message.response.includes("```") ? (
+                <div
+                  style={{
+                    backgroundColor: "#575756",
+                    color: "white",
+                    padding: "10px",
+                    borderRadius: "4px",
+                    whiteSpace: "pre", // to follow indentation
+                  }}
+                >
+                  {message.response.split("```")[1]}
                 </div>
-              ))}
+              ) : (
+                message.response
+                  .split("\n")
+                  .map((line, i) => <div key={i}>{line}</div>)
+              )}
             </div>
           </div>
         ))}
