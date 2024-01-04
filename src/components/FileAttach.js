@@ -1,35 +1,43 @@
 import React, { useState } from "react";
-import { AttachFile as AttachmentIcon } from "@material-ui/icons";
+import { AttachFile as AttachmentIcon ,Clear as ClearIcon} from "@material-ui/icons";
 import axios from "axios";
 
 const FileAttach = () => {
   const [uploadedFileName, setUploadedFileName] = useState("");
 
-  const handleFileChange = async (e) => {
+  const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
-    // For simplicity, let's just set the file name on successful upload.
-    setUploadedFileName(selectedFile.name);
-    const apiKey = "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";
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append("file", selectedFile);
 
     try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/files",
-        {
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: selectedFile.name }],
+      // Send the file to the backend Python server using axios
+      const response = await axios.post("http://localhost:5000/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-        }
-      );
-      console.log("Response ", response);
+      });
+      console.log("response",response)
+      // Handle the response, for example, set the uploaded file name
+      setUploadedFileName(response.data.fileName);
     } catch (error) {
-      console.error("File upload Error:", error.message);
+      console.error("Error uploading file:", error);
     }
   };
+
+  const handleRemoveFile = async() => {
+    try {
+      // Make a DELETE request to the Flask API endpoint
+      const response = await axios.delete(`http://localhost:5000/remove_file/${uploadedFileName}`);
+
+      // Handle the response message
+    } catch (error) {
+      console.error("Error removing file:", error);
+    }
+    setUploadedFileName("");
+  };
+
 
   return (
     <div>
@@ -43,7 +51,7 @@ const FileAttach = () => {
       <input
         type="file"
         id="fileInput"
-        onChange={handleFileChange}
+        onChange={handleFileUpload}
         style={{ display: "none" }}
       />
 
@@ -51,6 +59,7 @@ const FileAttach = () => {
       {uploadedFileName && (
         <div
           style={{
+            display:"flex",
             width: "70%",
             fontSize: "10px",
             fontWeight: "bold",
@@ -58,8 +67,18 @@ const FileAttach = () => {
           }}
         >
           {uploadedFileName}
+          <ClearIcon
+            style={{
+              cursor: "pointer",
+              color: "red",
+              fontSize: "16px",
+
+            }}
+            onClick={handleRemoveFile}
+          />
         </div>
       )}
+      
     </div>
   );
 };

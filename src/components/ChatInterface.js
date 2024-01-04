@@ -5,12 +5,14 @@ import SendIcon from "@material-ui/icons/Send";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import Microphone from "./Microphone";
 import FileAttach from "./FileAttach";
+import LoadingSpinner from "./LoadingSpinner";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const messagesContainerRef = useRef(null);
   const [scrollBottomArrow, setScrollBottomArrow] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -57,34 +59,33 @@ const ChatInterface = () => {
   const handleSendMessage = async () => {
     if (inputText.trim() === "") return;
 
-    const apiKey = "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";
-
     try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: inputText }],
+      setLoading(true); // to get loader
+      const response = await fetch("http://localhost:5000/generate_response", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-        }
-      );
+        body: new URLSearchParams({
+          user_query: inputText,
+        }),
+      });
+
+      const data = await response.json();
 
       setMessages([
         ...messages,
         {
           receiver: "user",
           request: inputText,
-          response: response.data.choices[0].message.content,
+          response: data.response,
           sender: "assistant",
         },
       ]);
     } catch (error) {
       console.error("Error sending message:", error.message);
+    } finally {
+      setLoading(false);
     }
 
     setInputText("");
@@ -115,7 +116,7 @@ const ChatInterface = () => {
         </div>
 
         <button onClick={handleSendMessage}>
-          <SendIcon />
+          {loading ? <LoadingSpinner/> : <SendIcon />}
         </button>
       </div>
       <div className="chat-messages" ref={messagesContainerRef}>
