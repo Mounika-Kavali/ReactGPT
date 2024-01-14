@@ -64,10 +64,11 @@ const ChatInterface = () => {
       const response = await fetch("http://localhost:5000/generate_response", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
-        body: new URLSearchParams({
+        body:JSON.stringify({
           user_query: inputText,
+          filename: "MicrosoftTeams-image_3.png"
         }),
       });
 
@@ -131,7 +132,7 @@ const ChatInterface = () => {
                 whiteSpace: "pre-line", // preserve both spaces and line breaks in the rendered text.
               }}
             >
-              <div style={{ minHeight: "10px" }}>{message.request}</div>
+              <div style={{ minHeight: "14px" }}>{message.request}</div>
             </div>
             <div
               className={`message ${message.sender}`}

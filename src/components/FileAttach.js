@@ -26,6 +26,8 @@ const FileAttach = () => {
 
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
+    const filename = selectedFile.name;
+    console.log("filename",filename)
     // Create a FormData object
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -33,7 +35,7 @@ const FileAttach = () => {
     try {
       // Send the file to the backend Python server using axios
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        `http://localhost:5000/upload/${filename}`,
         formData,
         {
           headers: {
