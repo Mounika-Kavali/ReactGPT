@@ -1,9 +1,12 @@
-import ChatInterface from "./components/ChatInterface";
+import ChatbotUI from "./components/ChatbotUI";
+import { AppProvider } from "./context/AppContext";
 
 function App() {
   return (
     <div className="App">
-      <ChatInterface />
+      <AppProvider>
+      <ChatbotUI/>
+      </AppProvider>
     </div>
   );
 }

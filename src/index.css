@@ -2,7 +2,7 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 95vh;
+  height: 80vh; /* height of chat container */
   max-width: 800px;
   margin: auto;
   border: 1px solid #ccc;
@@ -30,10 +30,10 @@
 }
 
 .user {
-  background-color: #f5e1ac;
+  background-color: #cbe9fc;
 }
 .assistant {
-  background-color: #f7d3e9;
+  background-color: #bff1e2;
 }
 
 .chat-input {
@@ -64,6 +64,17 @@
   font-size: medium;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
+.tuneIcon{
+  text-align: end;
+}
+
+.tune-icon:hover{
+  cursor: pointer;
+  padding: 5px;
+  background-color: rgb(164, 243, 213);
+  border-radius: 10px;
+}
+
 .file-attachment-icon {
   cursor: pointer;
 }
@@ -101,13 +112,3 @@ button {
   cursor: pointer;
 }
 
-.scroll-to-bottom {
-  position: absolute;
-  bottom: 30px;
-  right: 50%;
-  cursor: pointer;
-  padding: 0 3px;
-  border-radius: 50%;
-  color: #000;
-  background-color: #f0bcf7;
-}
