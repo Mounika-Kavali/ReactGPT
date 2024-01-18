@@ -10,7 +10,10 @@ const initialState = {
     data: "",
   },
   uploadedFile: {
-    filesList: [],
+    loading: false,
+    error: null,
+    fileList: [],
+    selectedFiles:[]
   },
   // Add other initial values as needed
 };

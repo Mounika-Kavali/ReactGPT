@@ -8,23 +8,26 @@ const FileAttach = () => {
   const states = useApp();
 
   const handleFileUpload = async (e) => {
-    const selectedFile = e.target.files[0];
-    const filename = selectedFile.name;
+    const uploadedFile = e.target.files[0];
+    const filename = uploadedFile.name;
+    const filepath = e.target.value; // doesnot provide full path
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", uploadedFile);
+    formData.append("filename", filename);
 
     try {
       await dispatch({
         type: "UPLOAD_FILE_REQUEST",
       });
       const response = await axios.post(
-        `http://localhost:5000/upload/${filename}`,
+        `http://localhost:5000/upload`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          params: { filename }
         }
       );
       await dispatch({
@@ -51,6 +54,7 @@ const FileAttach = () => {
         type="file"
         id="fileInput"
         onChange={handleFileUpload}
+        onClick={(e) => (e.target.value = null)}  // because file caches the selected file
         style={{ display: "none" }}
       />
     </div>

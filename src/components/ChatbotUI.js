@@ -41,10 +41,12 @@ const ChatbotUI = () => {
       type: "GENERATE_RESPONSE_REQUEST",
     });
     try {
+      
       const res = await axios.post("http://localhost:5000/generate_response", {
         user_query: inputText,
-        filename: "MicrosoftTeams-image_3.png",
+        filename: states.uploadedFile.selectedFiles, //selectedFiles[]
       });
+      console.log(states.uploadedFile.selectedFiles,"generate_response-files")
       const data = res.data.response;
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -66,6 +68,7 @@ const ChatbotUI = () => {
       });
     } finally {
       setLoading(false); // Reset loading state
+      setInputText("")
     }
   };
 

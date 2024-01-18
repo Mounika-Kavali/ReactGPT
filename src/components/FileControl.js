@@ -13,12 +13,15 @@ import { useApp, useAppDispatch } from "../context/AppContext";
 
 const FileControl = ({ showModal, onClose }) => {
   const [fileList, setFileList] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const dispatch = useAppDispatch();
   const states = useApp();
 
   useEffect(() => {
+    console.log("useEffect");
     fetchUploadedFiles();
+    fetchSelectedFiles();
   }, []);
 
   const fileIcons = {
@@ -33,6 +36,38 @@ const FileControl = ({ showModal, onClose }) => {
     return filename.split(".").pop().toLowerCase();
   };
 
+  const handleFileSelection = async (filename) => {
+    // Check if the file is already selected
+    if (!selectedFiles.includes(filename)) {
+      // Update the state and then dispatch the action
+      setSelectedFiles((prevSelectedFiles) => {
+        const updatedSelectedFiles = [...prevSelectedFiles, filename];
+        dispatch({
+          type: "FILES_SELECTION_SUCCESS",
+          payload: updatedSelectedFiles,
+        });
+        return updatedSelectedFiles;
+      });
+    } else {
+      // File is already selected, uncheck it (remove from selectedFiles)
+      setSelectedFiles((prevSelectedFiles) =>
+        prevSelectedFiles.filter((selectedFile) => selectedFile !== filename)
+      );
+
+      // Dispatch the updated state
+      dispatch({
+        type: "FILES_SELECTION_SUCCESS",
+        payload: selectedFiles.filter(
+          (selectedFile) => selectedFile !== filename
+        ),
+      });
+    }
+  };
+
+  const fetchSelectedFiles =()=>{
+    setSelectedFiles(states.uploadedFile.selectedFiles)
+  }
+  
   const fetchUploadedFiles = async () => {
     try {
       await dispatch({
@@ -73,6 +108,10 @@ const FileControl = ({ showModal, onClose }) => {
         type: "DELETE_UPLOADED_FILE_FAILURE",
         payload: error.message,
       });
+    } finally {
+      setSelectedFiles((prevSelectedFiles) =>
+        prevSelectedFiles.filter((selectedFile) => selectedFile !== filename)
+      );
     }
   };
   return (
@@ -89,10 +128,11 @@ const FileControl = ({ showModal, onClose }) => {
         <div className="fileNames">
           <ul style={{ listStyleType: "none" }}>
             {fileList.map((file, index) => {
+              // {console.log("selectedFiles",selectedFiles)}
+              const isSelected = selectedFiles.includes(file);
               const extension = getFileExtension(file);
               //   const FileIcon = fileIcons[extension] || InsertDriveFileIcon; //for diff icons based on extension but invalid in explorer browser
               const FileIcon = InsertDriveFileIcon;
-
               return (
                 <div
                   key={index}
@@ -102,9 +142,21 @@ const FileControl = ({ showModal, onClose }) => {
                     alignItems: "baseline",
                   }}
                 >
-                  <li style={{ marginTop: "15px" }}>
+                  <li
+                    style={{
+                      marginTop: "15px",
+                      border: isSelected ? "2px solid darkblue" : "none",
+                      backgroundColor: isSelected ? "yellow" : "transparent",
+                    }}
+                  >
                     <FileIcon style={{ marginRight: "5px" }} />
                     {file}
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleFileSelection(file)}
+                      style={{ cursor: "pointer" }} // hide the checkbox
+                    />
                   </li>
                   <RemoveIcon
                     style={{

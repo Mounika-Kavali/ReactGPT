@@ -8,13 +8,14 @@ import {
   DELETE_UPLOADED_FILE_REQUEST,
   DELETE_UPLOADED_FILE_SUCCESS,
   DELETE_UPLOADED_FILE_FAILURE,
+  FILES_SELECTION_SUCCESS
 } from "../actions/fileActions";
 
 const initialState = {
   loading: false,
   error: null,
-  fileName: "",
   fileList: [],
+  selectedFiles:[]
 };
 
 const fileReducer = (state = initialState, action) => {
@@ -43,6 +44,8 @@ const fileReducer = (state = initialState, action) => {
     case DELETE_UPLOADED_FILE_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
+    case FILES_SELECTION_SUCCESS:
+      return { ...state, loading: false, selectedFiles: action.payload };
     default:
       return state;
   }
