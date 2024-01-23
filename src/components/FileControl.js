@@ -32,6 +32,8 @@ const FileControl = ({ showModal, onClose }) => {
     png: "ImageIcon",
   };
 
+  
+
   const getFileExtension = (filename) => {
     return filename.split(".").pop().toLowerCase();
   };
@@ -68,6 +70,16 @@ const FileControl = ({ showModal, onClose }) => {
     setSelectedFiles(states.uploadedFile.selectedFiles)
   }
   
+  // const handleChosenFiles=async (e)=>{
+  //   let chosenFiles=[]
+  //   chosenFiles=states.uploadedFile.selectedFiles
+  //   console.log("chosenFiles",chosenFiles)
+  //   const response = await axios.post(`http://localhost:5000/load-files`,{fileList: chosenFiles}
+  //   );
+  // }
+
+
+
   const fetchUploadedFiles = async () => {
     try {
       await dispatch({
@@ -145,18 +157,15 @@ const FileControl = ({ showModal, onClose }) => {
                   <li
                     style={{
                       marginTop: "15px",
+                      cursor:"pointer",
                       border: isSelected ? "2px solid darkblue" : "none",
-                      backgroundColor: isSelected ? "yellow" : "transparent",
+                      backgroundColor: isSelected ? "#bfcaf1" : "transparent",
                     }}
+                    onClick={() => handleFileSelection(file)} 
                   >
                     <FileIcon style={{ marginRight: "5px" }} />
                     {file}
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleFileSelection(file)}
-                      style={{ cursor: "pointer" }} // hide the checkbox
-                    />
+                    
                   </li>
                   <RemoveIcon
                     style={{
@@ -171,6 +180,9 @@ const FileControl = ({ showModal, onClose }) => {
               );
             })}
           </ul>
+          {/* <div style={{display:"flex",justifyContent:"center"}}>
+          <button style={{padding:"10px",marginTop:"20%"}} onClick={() => {handleChosenFiles();  onClose(); }}>OK</button>
+          </div> */}
         </div>
       </div>
     </div>

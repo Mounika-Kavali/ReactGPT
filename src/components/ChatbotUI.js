@@ -34,6 +34,7 @@ const ChatbotUI = () => {
     }
   };
 
+
   const handleSendMessage = async () => {
     if (inputText.trim() === "") return;
     setLoading(true); // to get loader icon
@@ -41,12 +42,19 @@ const ChatbotUI = () => {
       type: "GENERATE_RESPONSE_REQUEST",
     });
     try {
-      
+      let selected_files = [];
+      let get_all_files = [];
+      let inputFiles = [];
+  
+      selected_files = states.uploadedFile.selectedFiles || [];
+      get_all_files = states.uploadedFile.fileList || [];
+  
+      inputFiles = selected_files.length > 0 ? selected_files : get_all_files;
+
       const res = await axios.post("http://localhost:5000/generate_response", {
         user_query: inputText,
-        filename: states.uploadedFile.selectedFiles, //selectedFiles[]
+        fileList: inputFiles,
       });
-      console.log(states.uploadedFile.selectedFiles,"generate_response-files")
       const data = res.data.response;
       setMessages((prevMessages) => [
         ...prevMessages,
