@@ -32,8 +32,6 @@ const FileControl = ({ showModal, onClose }) => {
     png: "ImageIcon",
   };
 
-  
-
   const getFileExtension = (filename) => {
     return filename.split(".").pop().toLowerCase();
   };
@@ -66,26 +64,18 @@ const FileControl = ({ showModal, onClose }) => {
     }
   };
 
-  const fetchSelectedFiles =()=>{
-    setSelectedFiles(states.uploadedFile.selectedFiles)
-  }
-  
-  // const handleChosenFiles=async (e)=>{
-  //   let chosenFiles=[]
-  //   chosenFiles=states.uploadedFile.selectedFiles
-  //   console.log("chosenFiles",chosenFiles)
-  //   const response = await axios.post(`http://localhost:5000/load-files`,{fileList: chosenFiles}
-  //   );
-  // }
-
-
+  const fetchSelectedFiles = () => {
+    setSelectedFiles(states.uploadedFile.selectedFiles);
+  };
 
   const fetchUploadedFiles = async () => {
     try {
       await dispatch({
         type: "GET_UPLOADED_FILES_REQUEST",
       });
-      const response = await axios.get("http://localhost:5000/get_all_files");
+      const response = await axios.get(
+        "http://localhost:5000/api/unstructured/get_all_files"
+      );
       const allFiles = response.data.AllFiles;
       console.log("allFiles", allFiles);
       setFileList(allFiles);
@@ -108,7 +98,7 @@ const FileControl = ({ showModal, onClose }) => {
         type: "DELETE_UPLOADED_FILE_REQUEST",
       });
       const response = await axios.delete(
-        `http://localhost:5000/remove_file/${filename}`
+        `http://localhost:5000/api/unstructured/remove_file/${filename}`
       );
       await dispatch({
         type: "DELETE_UPLOADED_FILE_SUCCESS",
@@ -138,51 +128,61 @@ const FileControl = ({ showModal, onClose }) => {
           </div>
         </div>
         <div className="fileNames">
-          <ul style={{ listStyleType: "none" }}>
-            {fileList.map((file, index) => {
-              // {console.log("selectedFiles",selectedFiles)}
-              const isSelected = selectedFiles.includes(file);
-              const extension = getFileExtension(file);
-              //   const FileIcon = fileIcons[extension] || InsertDriveFileIcon; //for diff icons based on extension but invalid in explorer browser
-              const FileIcon = InsertDriveFileIcon;
-              return (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <li
+          {fileList.length === 0 ? (
+            <p>No files uploaded</p>
+          ) : (
+            <ul style={{ listStyleType: "none" }}>
+              {fileList.map((file, index) => {
+                // {console.log("selectedFiles",selectedFiles)}
+                const isSelected = selectedFiles.includes(file);
+                const extension = getFileExtension(file);
+                //   const FileIcon = fileIcons[extension] || InsertDriveFileIcon; //for diff icons based on extension but invalid in explorer browser
+                const FileIcon = InsertDriveFileIcon;
+                return (
+                  <div
+                    key={index}
                     style={{
-                      marginTop: "15px",
-                      cursor:"pointer",
-                      border: isSelected ? "2px solid darkblue" : "none",
-                      backgroundColor: isSelected ? "#bfcaf1" : "transparent",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
                     }}
-                    onClick={() => handleFileSelection(file)} 
                   >
-                    <FileIcon style={{ marginRight: "5px" }} />
-                    {file}
-                    
-                  </li>
-                  <RemoveIcon
-                    style={{
-                      cursor: "pointer",
-                      color: "red",
-                      fontSize: "20px",
-                      marginLeft: "5px",
-                    }}
-                    onClick={() => handleRemoveFile(file)}
-                  />
-                </div>
-              );
-            })}
-          </ul>
-          {/* <div style={{display:"flex",justifyContent:"center"}}>
-          <button style={{padding:"10px",marginTop:"20%"}} onClick={() => {handleChosenFiles();  onClose(); }}>OK</button>
-          </div> */}
+                    <li
+                      style={{
+                        marginTop: "15px",
+                        cursor: "pointer",
+                        border: isSelected ? "2px solid darkblue" : "none",
+                        backgroundColor: isSelected ? "#bfcaf1" : "transparent",
+                      }}
+                      onClick={() => handleFileSelection(file)}
+                    >
+                      <FileIcon style={{ marginRight: "5px" }} />
+                      {file}
+                    </li>
+                    <RemoveIcon
+                      style={{
+                        cursor: "pointer",
+                        color: "red",
+                        fontSize: "20px",
+                        marginLeft: "5px",
+                      }}
+                      onClick={() => handleRemoveFile(file)}
+                    />
+                  </div>
+                );
+              })}
+            </ul>
+          )}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button
+              style={{ padding: "10px", marginTop: "10%" }}
+              onClick={() => {
+                onClose();
+              }}
+            >
+              OK
+            </button>
+          </div>
         </div>
       </div>
     </div>

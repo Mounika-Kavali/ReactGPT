@@ -14,6 +14,7 @@ const ChatbotUI = () => {
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileModalOpen, setFileModalOpen] = useState(false);
+  const [isTextareaFocused, setIsTextareaFocused] = useState(false);
 
   //   const { state, dispatch } = useContext(AppContext);
   const dispatch = useAppDispatch();
@@ -27,13 +28,20 @@ const ChatbotUI = () => {
     }
   }, [messages]);
 
+  const handleTextAreaFocus = () => {
+    setIsTextareaFocused(true);
+  };
+
+  const handleTextAreaBlur = () => {
+    setIsTextareaFocused(false);
+  };
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents the default behavior (submitting the form or adding a newline)
       handleSendMessage();
     }
   };
-
 
   const handleSendMessage = async () => {
     if (inputText.trim() === "") return;
@@ -45,16 +53,19 @@ const ChatbotUI = () => {
       let selected_files = [];
       let get_all_files = [];
       let inputFiles = [];
-  
+
       selected_files = states.uploadedFile.selectedFiles || [];
       get_all_files = states.uploadedFile.fileList || [];
-  
+
       inputFiles = selected_files.length > 0 ? selected_files : get_all_files;
 
-      const res = await axios.post("http://localhost:5000/generate_response", {
-        user_query: inputText,
-        fileList: inputFiles,
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/unstructured/generate_response",
+        {
+          user_query: inputText,
+          fileList: inputFiles,
+        }
+      );
       const data = res.data.response;
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -76,7 +87,7 @@ const ChatbotUI = () => {
       });
     } finally {
       setLoading(false); // Reset loading state
-      setInputText("")
+      setInputText("");
     }
   };
 
@@ -94,18 +105,57 @@ const ChatbotUI = () => {
 
   return (
     <>
-      <div className="Heading">
-        <h2>
-          <u>
-            <center>Document Query-Response System</center>
-          </u>
-        </h2>
-      </div>
-      <div className="tuneIcon"  >
-        <TuneIcon className="tune-icon" onClick={handleFileModalOpen}/>
+      <div className="header">
+        <div>
+          <img
+            src="https://www.sparity.com/wp-content/uploads/2022/09/sparitylogo-color.png"
+            width="110"
+            height="50"
+            alt="sparity-logo"
+          />
+        </div>
+
+        <div className="Heading">
+          <div>
+            <h2>Document Query-Response System</h2>
+          </div>
+          <div>
+            {isTextareaFocused ? (
+              <div className="bot-image-container">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/13514/13514207.png"
+                  width="70"
+                  height="70"
+                  alt="botThinking"
+                  title="botThinking"
+                  className="img-small"
+                />
+              </div>
+            ) : (
+              <div className="bot-image-container">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/13514/13514160.png"
+                  width="70"
+                  height="70"
+                  alt="botIdea"
+                  title="botIdea"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="tuneIcon">
+          <TuneIcon className="tune-icon" onClick={handleFileModalOpen} />
+        </div>
       </div>
 
-      {fileModalOpen && <FileControl showModal={handleFileModalOpen} onClose={handleFileModalClose}/>}
+      {fileModalOpen && (
+        <FileControl
+          showModal={handleFileModalOpen}
+          onClose={handleFileModalClose}
+        />
+      )}
 
       <div className="chat-container">
         <div id="chat-messages" className="chat-messages">
@@ -119,6 +169,7 @@ const ChatbotUI = () => {
                   whiteSpace: "pre-line", // preserve both spaces and line breaks(\n) in the rendered text.
                 }}
               >
+                <div style={{ fontFamily: "bold",fontSize:"14px",textDecorationLine:"underline",color:"#c4910f" }}>You</div>
                 <div style={{ minHeight: "14px" }}>{message.request}</div>
               </div>
               <div
@@ -129,6 +180,7 @@ const ChatbotUI = () => {
                   whiteSpace: "pre-line",
                 }}
               >
+                <div style={{ fontFamily: "bold",fontSize:"14px",textDecorationLine:"underline",color:"#bc3153" }}>Assistant</div>
                 <div>{message.response}</div>
               </div>
             </div>
@@ -141,9 +193,11 @@ const ChatbotUI = () => {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type your message..."
+              placeholder="Ask your question..."
               rows={Math.min(inputText.split("\n").length + 1, 4)} // Set the initial number of rows to the number of lines in the text up to a maximum of 4
               onKeyDown={handleKeyPress}
+              onFocus={handleTextAreaFocus}
+              onBlur={handleTextAreaBlur}
             />
             <div className="file-icon">
               <FileAttach />

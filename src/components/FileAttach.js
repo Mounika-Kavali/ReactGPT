@@ -20,7 +20,7 @@ const FileAttach = () => {
       await dispatch({
         type: "UPLOAD_FILE_REQUEST",
       });
-      const response = await axios.post(`http://localhost:5000/upload`,formData,
+      const response = await axios.post(`http://localhost:5000/api/unstructured/upload`,formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
