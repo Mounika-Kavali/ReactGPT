@@ -1,12 +1,12 @@
 /* ChatInterface.css */
 
-.header{
+.header {
   display: flex;
   justify-content: space-around;
   align-items: baseline;
 }
 
-.Heading{
+.Heading {
   display: flex;
 }
 
@@ -39,7 +39,7 @@
   margin-bottom: 10px;
   padding: 8px;
   border-radius: 8px;
-  color:#0c0c0c
+  color: #0c0c0c;
 }
 
 .user {
@@ -79,11 +79,11 @@
   font-size: medium;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
-.tuneIcon{
+.tuneIcon {
   text-align: end;
 }
 
-.tune-icon:hover{
+.tune-icon:hover {
   cursor: pointer;
   padding: 10px;
   background-color: rgb(164, 243, 213);
@@ -126,4 +126,3 @@ button {
   border-radius: 10px;
   cursor: pointer;
 }
-

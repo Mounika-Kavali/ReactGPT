@@ -56,8 +56,10 @@ const ChatbotUI = () => {
 
       selected_files = states.uploadedFile.selectedFiles || [];
       get_all_files = states.uploadedFile.fileList || [];
+      // const all_pdf_files = get_all_files.filter(file => file.toLowerCase().endsWith('.pdf'));
 
-      inputFiles = selected_files.length > 0 ? selected_files : get_all_files;
+
+      inputFiles = selected_files.length > 0 ? selected_files : [];
 
       const res = await axios.post(
         "http://localhost:5000/api/unstructured/generate_response",
@@ -167,6 +169,7 @@ const ChatbotUI = () => {
                   fontFamily: "sans-serif",
                   fontSize: "medium",
                   whiteSpace: "pre-line", // preserve both spaces and line breaks(\n) in the rendered text.
+                  // maxWidth: message.request.length > 50 ? "400px" : "200px",
                 }}
               >
                 <div style={{ fontFamily: "bold",fontSize:"14px",textDecorationLine:"underline",color:"#c4910f" }}>You</div>
