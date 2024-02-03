@@ -8,26 +8,37 @@ const FileAttach = () => {
   const states = useApp();
 
   const handleFileUpload = async (e) => {
-    const uploadedFile = e.target.files[0];
-    const filename = uploadedFile.name;
-    const filepath = e.target.value; // doesnot provide full path
+    const uploadedFiles = e.target.files;
+    const fileData = [];
+
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      const file = uploadedFiles[i];
+      const filename = file.name;
+      fileData.push({ file, filename });
+    }
 
     const formData = new FormData();
-    formData.append("file", uploadedFile);
-    formData.append("filename", filename);
+
+    fileData.forEach(({ file, filename }) => {
+      formData.append("files", file);
+      formData.append("filenames", filename);
+    });
 
     try {
       await dispatch({
         type: "UPLOAD_FILE_REQUEST",
       });
-      const response = await axios.post(`http://localhost:5000/api/unstructured/upload`,formData,
+      console.log("FD",formData)
+      const response = await axios.post(
+        `http://localhost:5000/api/unstructured/upload`,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          params: { filename }
         }
       );
+      console.log("Upload response:",response.data)
       await dispatch({
         type: "UPLOAD_FILE_SUCCESS",
       });
@@ -51,8 +62,9 @@ const FileAttach = () => {
       <input
         type="file"
         id="fileInput"
+        multiple
         onChange={handleFileUpload}
-        onClick={(e) => (e.target.value = null)}  // because file caches the selected file
+        onClick={(e) => (e.target.value = null)} // because file caches the selected file
         style={{ display: "none" }}
       />
     </div>
