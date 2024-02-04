@@ -126,3 +126,27 @@ button {
   border-radius: 10px;
   cursor: pointer;
 }
+.imgButton {
+  padding: 10px;
+  background-color: #f188b7;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.imgButton:disabled {
+  opacity: 0.7;
+  background-color:#888686; 
+  cursor: not-allowed; 
+}
+
+#previousImgButton:hover {
+  color: #070707;
+  border: 1px solid #090909; 
+}
+
+#nextImgButton:hover {
+  color: #070707;
+  border: 1px solid #090909;
+}
