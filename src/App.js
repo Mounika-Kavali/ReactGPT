@@ -6,8 +6,8 @@ function App() {
   return (
     <div className="App">
       <AppProvider>
-      {/* <ChatbotUI/> */}
-      <InteractiveBotUI/>
+      <ChatbotUI/>
+      {/* <InteractiveBotUI/> */}
       </AppProvider>
     </div>
   );

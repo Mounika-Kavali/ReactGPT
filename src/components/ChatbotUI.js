@@ -4,6 +4,7 @@ import SendIcon from "@material-ui/icons/Send";
 import TuneIcon from "@mui/icons-material/Tune";
 import Microphone from "./Microphone";
 import FileAttach from "./FileAttach";
+import { Switch } from "@material-ui/core";
 import LoadingSpinner from "./LoadingSpinner";
 import { AppContext, useApp, useAppDispatch } from "../context/AppContext";
 import axios from "axios";
@@ -15,6 +16,7 @@ const ChatbotUI = () => {
   const [loading, setLoading] = useState(false);
   const [fileModalOpen, setFileModalOpen] = useState(false);
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+  const [webAccess, setWebAccess] = useState(false);
 
   //   const { state, dispatch } = useContext(AppContext);
   const dispatch = useAppDispatch();
@@ -39,7 +41,11 @@ const ChatbotUI = () => {
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents the default behavior (submitting the form or adding a newline)
+      if(webAccess){
+        handleSwitchOn();
+      }else{
       handleSendMessage();
+      }
     }
   };
 
@@ -57,7 +63,6 @@ const ChatbotUI = () => {
       selected_files = states.uploadedFile.selectedFiles || [];
       get_all_files = states.uploadedFile.fileList || [];
       // const all_pdf_files = get_all_files.filter(file => file.toLowerCase().endsWith('.pdf'));
-
 
       inputFiles = selected_files.length > 0 ? selected_files : [];
 
@@ -103,6 +108,35 @@ const ChatbotUI = () => {
 
   const handleFileModalClose = () => {
     setFileModalOpen(false);
+  };
+
+  const handleSwitchOn = async () => {
+    if (inputText.trim() === "") return;
+    try {
+      const parts = inputText.split("\n");
+      const webUrls = parts[0].split(",").map((url) => url.trim());
+      const webQuery = parts[1].trim();
+
+      const res = await axios.post(
+        "http://localhost:5000/api/unstructured/web_response",
+        {
+          url_query: webQuery,
+          web_urls: webUrls,
+        }
+      );
+      const data = res.data.response;
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          Human: "user",
+          request: inputText,
+          response: data,
+          AI: "assistant",
+        },
+      ]);
+    } catch (error) {
+      console.log("Error occurred while generating response:", error);
+    }
   };
 
   return (
@@ -172,7 +206,16 @@ const ChatbotUI = () => {
                   // maxWidth: message.request.length > 50 ? "400px" : "200px",
                 }}
               >
-                <div style={{ fontFamily: "bold",fontSize:"14px",textDecorationLine:"underline",color:"#c4910f" }}>You</div>
+                <div
+                  style={{
+                    fontFamily: "bold",
+                    fontSize: "14px",
+                    textDecorationLine: "underline",
+                    color: "#c4910f",
+                  }}
+                >
+                  You
+                </div>
                 <div style={{ minHeight: "14px" }}>{message.request}</div>
               </div>
               <div
@@ -183,7 +226,16 @@ const ChatbotUI = () => {
                   whiteSpace: "pre-line",
                 }}
               >
-                <div style={{ fontFamily: "bold",fontSize:"14px",textDecorationLine:"underline",color:"#bc3153" }}>Assistant</div>
+                <div
+                  style={{
+                    fontFamily: "bold",
+                    fontSize: "14px",
+                    textDecorationLine: "underline",
+                    color: "#bc3153",
+                  }}
+                >
+                  Assistant
+                </div>
                 <div>{message.response}</div>
               </div>
             </div>
@@ -191,12 +243,26 @@ const ChatbotUI = () => {
         </div>
 
         <div className="chat-input">
+          <Switch
+            checked={webAccess}
+            onChange={(event) => {
+              setWebAccess(event.target.checked);
+              
+            }}
+            color="primary"
+            name="webAccessToggle"
+            inputProps={{ "aria-label": "Web access toggle" }}
+          />
           <div className="textarea-wrapper">
             <textarea
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ask your question..."
+              placeholder={
+                webAccess
+                  ? "paste web URL\nhere enter your query... "
+                  : "Ask your question..."
+              }
               rows={Math.min(inputText.split("\n").length + 1, 4)} // Set the initial number of rows to the number of lines in the text up to a maximum of 4
               onKeyDown={handleKeyPress}
               onFocus={handleTextAreaFocus}
@@ -210,7 +276,7 @@ const ChatbotUI = () => {
             </div>
           </div>
 
-          <button onClick={handleSendMessage}>
+          <button onClick={webAccess?handleSwitchOn:handleSendMessage}>
             {loading ? <LoadingSpinner /> : <SendIcon />}
           </button>
         </div>
