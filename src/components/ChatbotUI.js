@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import SendIcon from "@material-ui/icons/Send";
 import TuneIcon from "@mui/icons-material/Tune";
+import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOfflineOutlined";
+
 import Microphone from "./Microphone";
 import FileAttach from "./FileAttach";
 import { Switch } from "@material-ui/core";
@@ -9,6 +11,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { AppContext, useApp, useAppDispatch } from "../context/AppContext";
 import axios from "axios";
 import FileControl from "./FileControl";
+import jsPDF from "jspdf";
 
 const ChatbotUI = () => {
   const [messages, setMessages] = useState([]);
@@ -30,6 +33,75 @@ const ChatbotUI = () => {
     }
   }, [messages]);
 
+  const downloadMessageAsPDF = (message, index) => {
+    const pdf = new jsPDF();
+
+    const drawBorder = () => {
+      pdf.setDrawColor(0);
+      pdf.setLineWidth(0.5);
+      pdf.rect(
+        margins.left,
+        margins.top,
+        pdf.internal.pageSize.getWidth() - margins.left - margins.right,
+        pdf.internal.pageSize.getHeight() - margins.top - margins.bottom
+      );
+    };
+
+    const margins = {
+      top: 25,
+      bottom: 25,
+      left: 10,
+      right: 10,
+    };
+
+    // Additional gap between the border and the text
+    const textGap = 5;
+    const pageWidth =
+      pdf.internal.pageSize.getWidth() -
+      margins.left -
+      margins.right -
+      2 * textGap;
+    let yPos = margins.top;
+
+    // Initially draw border for the first page
+    drawBorder();
+    const lines = message.response.split("\n");
+    lines.forEach((line) => {
+      let isHeading = false;
+      let fontSize = 12;
+      if (line.startsWith("**") && line.endsWith("**")) {
+        // Simple way to identify headings
+        isHeading = true;
+        fontSize = 16;
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(fontSize); // Larger size for headings
+        line = line.substring(2, line.length - 2); // Remove markers
+        yPos += 5; // Additional space before heading
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(fontSize); // Smaller size for regular content
+      }
+
+      const splitText = pdf.splitTextToSize(line, pageWidth);
+      splitText.forEach((textLine) => {
+        if (
+          yPos + fontSize * 0.5 >
+          pdf.internal.pageSize.getHeight() - margins.bottom
+        ) {
+          pdf.addPage();
+          yPos = margins.top;
+          drawBorder(); // Draw border for the new page
+        }
+        pdf.text(textLine, margins.left + textGap, yPos + textGap);
+        yPos += fontSize * 0.5;
+      });
+    });
+
+    drawBorder();
+
+    pdf.save(`message_${index + 1}.pdf`);
+  };
+
   const handleTextAreaFocus = () => {
     setIsTextareaFocused(true);
   };
@@ -41,10 +113,10 @@ const ChatbotUI = () => {
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents the default behavior (submitting the form or adding a newline)
-      if(webAccess){
+      if (webAccess) {
         handleSwitchOn();
-      }else{
-      handleSendMessage();
+      } else {
+        handleSendMessage();
       }
     }
   };
@@ -62,7 +134,6 @@ const ChatbotUI = () => {
 
       selected_files = states.uploadedFile.selectedFiles || [];
       get_all_files = states.uploadedFile.fileList || [];
-      // const all_pdf_files = get_all_files.filter(file => file.toLowerCase().endsWith('.pdf'));
 
       inputFiles = selected_files.length > 0 ? selected_files : [];
 
@@ -112,11 +183,14 @@ const ChatbotUI = () => {
 
   const handleSwitchOn = async () => {
     if (inputText.trim() === "") return;
-    try {
-      const parts = inputText.split("\n");
-      const webUrls = parts[0].split(",").map((url) => url.trim());
-      const webQuery = parts[1].trim();
 
+    try {
+      setLoading(true); // to get loader icon
+      
+      const parts = inputText.split("\n");
+      const webUrls = parts[0]?.split(",").map((url) => url.trim());
+      const webQuery = parts[1]?.trim();
+      console.log(webUrls, webQuery);
       const res = await axios.post(
         "http://localhost:5000/api/unstructured/web_response",
         {
@@ -134,8 +208,12 @@ const ChatbotUI = () => {
           AI: "assistant",
         },
       ]);
+      
     } catch (error) {
-      console.log("Error occurred while generating response:", error);
+      console.log(error)
+    } finally {
+      setLoading(false); // Reset loading state
+      // setInputText("");
     }
   };
 
@@ -154,30 +232,6 @@ const ChatbotUI = () => {
         <div className="Heading">
           <div>
             <h2>Document Query-Response System</h2>
-          </div>
-          <div>
-            {isTextareaFocused ? (
-              <div className="bot-image-container">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/13514/13514207.png"
-                  width="70"
-                  height="70"
-                  alt="botThinking"
-                  title="botThinking"
-                  className="img-small"
-                />
-              </div>
-            ) : (
-              <div className="bot-image-container">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/13514/13514160.png"
-                  width="70"
-                  height="70"
-                  alt="botIdea"
-                  title="botIdea"
-                />
-              </div>
-            )}
           </div>
         </div>
 
@@ -232,9 +286,16 @@ const ChatbotUI = () => {
                     fontSize: "14px",
                     textDecorationLine: "underline",
                     color: "#bc3153",
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Assistant
+                  <div>Assistant</div>
+                  <div style={{ cursor: "pointer" }}>
+                    <DownloadForOfflineOutlinedIcon
+                      onClick={() => downloadMessageAsPDF(message, index)}
+                    />
+                  </div>
                 </div>
                 <div>{message.response}</div>
               </div>
@@ -247,7 +308,6 @@ const ChatbotUI = () => {
             checked={webAccess}
             onChange={(event) => {
               setWebAccess(event.target.checked);
-              
             }}
             color="primary"
             name="webAccessToggle"
@@ -276,7 +336,7 @@ const ChatbotUI = () => {
             </div>
           </div>
 
-          <button onClick={webAccess?handleSwitchOn:handleSendMessage}>
+          <button onClick={webAccess ? handleSwitchOn : handleSendMessage}>
             {loading ? <LoadingSpinner /> : <SendIcon />}
           </button>
         </div>

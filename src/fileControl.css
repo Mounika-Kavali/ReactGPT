@@ -1,6 +1,7 @@
 /* Modal Container */
 .modal {
   position: fixed;
+  z-index: 999;
   top: 0;
   right: 0;
   width: 350px;

@@ -34,11 +34,11 @@ export const AppProvider = ({ children }) => {
 };
 
 export function useApp() {
-    return useContext(AppContext);
-  }
-  
-  export function useAppDispatch() {
-    return useContext(AppDispatchContext);
-  }
+  return useContext(AppContext);
+}
+
+export function useAppDispatch() {
+  return useContext(AppDispatchContext);
+}
 
 // export { AppContext, AppProvider };

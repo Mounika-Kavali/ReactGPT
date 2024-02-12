@@ -77,15 +77,8 @@ const InteractiveBotUI = () => {
         payload: data,
       });
 
-      // await fetchSingleStep(inputText, stepNumber);
-      setMessages(() => [
-        {
-          Human: "user",
-          request: inputText,
-          response: data,
-          AI: "assistant",
-        },
-      ]);
+      await fetchSingleStep(inputText, stepNumber);
+      
     } catch (error) {
       dispatch({
         type: "GENERATE_RESPONSE_FAILURE",
