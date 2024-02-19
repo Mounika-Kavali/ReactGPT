@@ -9,6 +9,7 @@ function App() {
   const toggleCheckbox = () => {
     setIsInteractive(!isInteractive);
   };
+
   return (
     <div className="App">
       <AppProvider>

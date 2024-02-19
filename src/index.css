@@ -11,7 +11,7 @@
 }
 
 .chat-container {
-  background-image: url("./assets/images/chat_wallpaper.webp");
+  /* background-image: url("./assets/images/chat_wallpaper.webp"); */
   display: flex;
   flex-direction: column;
   height: 80vh; /* height of chat container */

@@ -7,6 +7,9 @@ const FileAttach = () => {
   const dispatch = useAppDispatch();
   const states = useApp();
 
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadModalMessage, setuploadModalMessage] = useState('');
+
   const handleFileUpload = async (e) => {
     const uploadedFiles = e.target.files;
     const fileData = [];
@@ -28,17 +31,18 @@ const FileAttach = () => {
       await dispatch({
         type: "UPLOAD_FILE_REQUEST",
       });
-      console.log("FD",formData)
+
       const response = await axios.post(
         `http://localhost:5000/api/unstructured/upload`,
         formData,
         {
+          params: { active_tab: "unstructured" },
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log("Upload response:",response.data)
+      console.log("Upload response:", response.data);
       await dispatch({
         type: "UPLOAD_FILE_SUCCESS",
       });

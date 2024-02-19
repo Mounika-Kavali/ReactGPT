@@ -77,7 +77,8 @@ const FileControl = ({ showModal, onClose }) => {
         type: "GET_UPLOADED_FILES_REQUEST",
       });
       const response = await axios.get(
-        "http://localhost:5000/api/unstructured/get_all_files"
+        "http://localhost:5000/api/unstructured/get_all_files",
+        { params: { active_tab: "unstructured" } }
       );
       const allFiles = response.data.AllFiles;
       console.log("allFiles", allFiles);
@@ -121,7 +122,8 @@ const FileControl = ({ showModal, onClose }) => {
         type: "DELETE_UPLOADED_FILE_REQUEST",
       });
       const response = await axios.delete(
-        `http://localhost:5000/api/unstructured/remove_file/${filename}`
+        `http://localhost:5000/api/unstructured/remove_file/${filename}`,
+        { params: { active_tab: "unstructured" } }
       );
       await dispatch({
         type: "DELETE_UPLOADED_FILE_SUCCESS",
@@ -151,8 +153,8 @@ const FileControl = ({ showModal, onClose }) => {
           </div>
         </div>
         {loading ? (
-          <div style={{display:"flex",justifyContent:"center"}}>
-          <LoadingSpinner />
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <LoadingSpinner />
           </div>
         ) : (
           <div className="fileNames">

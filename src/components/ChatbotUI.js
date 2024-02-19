@@ -21,6 +21,8 @@ const ChatbotUI = () => {
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
   const [webAccess, setWebAccess] = useState(false);
 
+
+
   //   const { state, dispatch } = useContext(AppContext);
   const dispatch = useAppDispatch();
   const states = useApp();
@@ -113,11 +115,7 @@ const ChatbotUI = () => {
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents the default behavior (submitting the form or adding a newline)
-      if (webAccess) {
-        handleSwitchOn();
-      } else {
-        handleSendMessage();
-      }
+      handleSendMessage();
     }
   };
 
@@ -131,17 +129,29 @@ const ChatbotUI = () => {
       let selected_files = [];
       let get_all_files = [];
       let inputFiles = [];
+      let webUrls = [];
+      let webQuery = "";
 
       selected_files = states.uploadedFile.selectedFiles || [];
       get_all_files = states.uploadedFile.fileList || [];
-
       inputFiles = selected_files.length > 0 ? selected_files : [];
 
+      if (webAccess) {
+        const parts = inputText.split("\n");
+        webUrls = parts[0]?.split(",").map((url) => url.trim());
+        webQuery = parts[1]?.trim();
+      }
+
       const res = await axios.post(
-        "http://localhost:5000/api/unstructured/generate_response",
+        "http://localhost:5000/api/unstructured/get_response",
         {
           user_query: inputText,
           fileList: inputFiles,
+          url_query: webQuery,
+          web_urls: webUrls,
+          doc_scraping: !webAccess,
+          web_scraping: webAccess,
+          active_tab: "unstructured"
         }
       );
       const data = res.data.response;
@@ -179,42 +189,6 @@ const ChatbotUI = () => {
 
   const handleFileModalClose = () => {
     setFileModalOpen(false);
-  };
-
-  const handleSwitchOn = async () => {
-    if (inputText.trim() === "") return;
-
-    try {
-      setLoading(true); // to get loader icon
-      
-      const parts = inputText.split("\n");
-      const webUrls = parts[0]?.split(",").map((url) => url.trim());
-      const webQuery = parts[1]?.trim();
-      console.log(webUrls, webQuery);
-      const res = await axios.post(
-        "http://localhost:5000/api/unstructured/web_response",
-        {
-          url_query: webQuery,
-          web_urls: webUrls,
-        }
-      );
-      const data = res.data.response;
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          Human: "user",
-          request: inputText,
-          response: data,
-          AI: "assistant",
-        },
-      ]);
-      
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false); // Reset loading state
-      // setInputText("");
-    }
   };
 
   return (
@@ -336,7 +310,7 @@ const ChatbotUI = () => {
             </div>
           </div>
 
-          <button onClick={webAccess ? handleSwitchOn : handleSendMessage}>
+          <button onClick={handleSendMessage}>
             {loading ? <LoadingSpinner /> : <SendIcon />}
           </button>
         </div>

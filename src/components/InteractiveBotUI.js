@@ -65,6 +65,7 @@ const InteractiveBotUI = () => {
         {
           user_query: inputText,
           fileList: inputFiles,
+          active_tab: "unstructured"
         }
       );
 
@@ -162,7 +163,7 @@ const InteractiveBotUI = () => {
         />
       )}
 
-      <div className="chat-container">
+      <div className="chat-container" style={{ backgroundImage: `url("./assets/images/chat_wallpaper.webp")` }}>
         <div className="chat-input">
           <div className="textarea-wrapper">
             <textarea
