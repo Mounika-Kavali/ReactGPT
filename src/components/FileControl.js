@@ -99,15 +99,16 @@ const FileControl = ({ showModal, onClose }) => {
   };
 
   const handleDownloadFile = (filename) => {
+    const lowerCaseFilename = filename.toLowerCase();
     if (
-      filename.includes(".png") ||
-      filename.includes(".jpg") ||
-      filename.includes(".jpeg")
+      lowerCaseFilename.includes(".png") ||
+      lowerCaseFilename.includes(".jpg") ||
+      lowerCaseFilename.includes(".jpeg")
     ) {
       window.open(
         `https://genaiblobstorage123.blob.core.windows.net/unstructuredatacontainer/dataset/imgs/${filename}`
       );
-    } else if (filename.includes(".pdf") || filename.includes(".docx")) {
+    } else if (lowerCaseFilename.includes(".pdf") || lowerCaseFilename.includes(".docx")) {
       window.open(
         `https://genaiblobstorage123.blob.core.windows.net/unstructuredatacontainer/dataset/docs/${filename}`
       );

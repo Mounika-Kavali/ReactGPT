@@ -107,6 +107,15 @@
   border-radius: 50%;
 }
 
+.stop-icon{
+  margin:0px 5px 0px 20px;
+  cursor: pointer;
+}
+
+.stop-icon:hover{
+  color:red
+}
+
 /* For WebKit browsers (Chrome, Safari) not in firefox*/
 .textarea-wrapper textarea::-webkit-scrollbar {
   width: 6px;

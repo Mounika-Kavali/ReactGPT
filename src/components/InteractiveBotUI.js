@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import SendIcon from "@material-ui/icons/Send";
 import TuneIcon from "@mui/icons-material/Tune";
+import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
 import Microphone from "./Microphone";
 import FileAttach from "./FileAttach";
 import LoadingSpinner from "./LoadingSpinner";
@@ -15,15 +16,9 @@ const InteractiveBotUI = () => {
   const [loading, setLoading] = useState(false);
   const [fileModalOpen, setFileModalOpen] = useState(false);
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
-  const [stepNumber, setStepNumber] = useState(1);
   const [matchedImgs, setMatchedImgs] = useState([]);
-  const [totalSteps, setTotalSteps] = useState(1);
-
-  useEffect(() => {
-    if (stepNumber > 1) {
-      fetchSingleStep(inputText, stepNumber);
-    }
-  }, [stepNumber]);
+  const [threadId, setThreadId] = useState("");
+  const [selectedFile, setSelectedFile] = useState([]);
 
   //   const { state, dispatch } = useContext(AppContext);
   const dispatch = useAppDispatch();
@@ -59,27 +54,45 @@ const InteractiveBotUI = () => {
       get_all_files = states.uploadedFile.fileList || [];
 
       inputFiles = selected_files.length > 0 ? selected_files : [];
-
-      const res = await axios.post(
-        "http://localhost:5000/api/unstructured/generate_response",
-        {
-          user_query: inputText,
-          fileList: inputFiles,
-          active_tab: "unstructured"
-        }
-      );
-
-      const data = res.data.response;
-      if (data) {
-        console.log("Whole response to the question is successfully loaded.");
+      let res;
+      if (threadId) {
+        //CONTINUE CONVERSATION
+        res = await axios.post(
+          "http://localhost:5000/api/interactive_unstructured/continue-chat",
+          {
+            user_query: inputText,
+            fileList: inputFiles,
+            chat_thread_id: threadId,
+          }
+        );
+      } else {
+        //START NEW CONVERSATION
+        res = await axios.post(
+          "http://localhost:5000/api/interactive_unstructured/start-chat",
+          {
+            user_query: inputText,
+            fileList: inputFiles,
+            chat_thread_id: threadId,
+          }
+        );
       }
+      const asst_data = res.data.assistant_res;
+      setThreadId(res.data.chat_thread_id);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          Human: "user",
+          request: inputText,
+          response: asst_data,
+          AI: "assistant",
+        },
+      ]);
+      setMatchedImgs(res.data.matched_images);
+      setSelectedFile(states.uploadedFile.selectedFiles);
       await dispatch({
         type: "GENERATE_RESPONSE_SUCCESS",
-        payload: data,
+        payload: asst_data,
       });
-
-      await fetchSingleStep(inputText, stepNumber);
-      
     } catch (error) {
       dispatch({
         type: "GENERATE_RESPONSE_FAILURE",
@@ -88,28 +101,6 @@ const InteractiveBotUI = () => {
     } finally {
       setLoading(false); // Reset loading state
       //   setInputText("");
-    }
-  };
-
-  const fetchSingleStep = async (question, step_number) => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/unstructured/get_single_step",
-        { params: { question, step_number } }
-      );
-      const data = response.data.single_step;
-      setMessages(() => [
-        {
-          Human: "user",
-          request: inputText,
-          response: data,
-          AI: "assistant",
-        },
-      ]);
-      setMatchedImgs(response.data.matched_images);
-      setTotalSteps(response.data.total_steps);
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -125,12 +116,9 @@ const InteractiveBotUI = () => {
     setFileModalOpen(false);
   };
 
-  const handlePreviousStep = () => {
-    setStepNumber(stepNumber - 1);
-  };
-
-  const handleNextStep = () => {
-    setStepNumber(stepNumber + 1);
+  const handleStopConversation = () => {
+    setThreadId("");
+    console.log("conversation thread is cleared",threadId)
   };
 
   return (
@@ -163,7 +151,12 @@ const InteractiveBotUI = () => {
         />
       )}
 
-      <div className="chat-container" style={{ backgroundImage: `url("./assets/images/chat_wallpaper.webp")` }}>
+      <div
+        className="chat-container"
+        style={{
+          backgroundImage: `url("./assets/images/chat_wallpaper.webp")`,
+        }}
+      >
         <div className="chat-input">
           <div className="textarea-wrapper">
             <textarea
@@ -182,6 +175,11 @@ const InteractiveBotUI = () => {
             <div className="mic-icon">
               <Microphone onSpeechResult={handleSpeechResult} />
             </div>
+            {threadId && (
+              <div className="stop-icon">
+                <StopCircleOutlinedIcon onClick={handleStopConversation} />
+              </div>
+            )}
           </div>
 
           <button
@@ -222,37 +220,11 @@ const InteractiveBotUI = () => {
             {matchedImgs.map((imgUrl, index) => (
               <img
                 key={index}
-                src={`https://genaiblobstorage123.blob.core.windows.net/unstructuredatacontainer/dataset/extracted-imgs/${imgUrl}`}
+                src={`https://genaiblobstorage123.blob.core.windows.net/unstructuredatacontainer/dataset/extracted-imgs/${selectedFile}/${imgUrl}`}
                 alt="Matching images to the response"
                 style={{ width: "100%", maxWidth: "500px", padding: "10px" }}
               />
             ))}
-            {
-              <div
-                style={{ width: "50%", bottom: "100px", position: "absolute" }}
-              >
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <button
-                    onClick={() => handlePreviousStep()}
-                    className="imgButton"
-                    id="previousImgButton"
-                    disabled={stepNumber <= 1}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handleNextStep()}
-                    className="imgButton"
-                    id="nextImgButton"
-                    disabled={stepNumber >= totalSteps}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            }
           </div>
         </div>
       </div>
